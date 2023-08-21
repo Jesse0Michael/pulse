@@ -1,0 +1,25 @@
+name: Release Workflow
+on:
+  release:
+    types: [published]
+
+jobs:
+  release:
+    env:
+      REF: ${{ github.ref }}
+    name: Release Pulse
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Build
+        run: |
+          docker build \
+            --file ./build/Dockerfile \
+            -t docker.pkg.github.com/jesse0michael/pulse:${REF##*/} .
+
+      - name: Push
+        run: |
+          docker login docker.pkg.github.com -u Jesse0Michael -p ${{ secrets.PAT }}
+          docker push docker.pkg.github.com/jesse0michael/pulse:${REF##*/}

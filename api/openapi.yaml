@@ -1,0 +1,49 @@
+openapi: 3.0.3
+info:
+  title: Pulse API
+  description: AI Empowered Insights
+  version: 0.0.0
+servers:
+  - description: Pulse Host
+    url: https://localhost:8080/
+paths:
+  /summary:
+    get:
+      description: Get Pulse summary
+      operationId: getSummary
+      parameters:
+        - description: start_date
+          in: query
+          name: start date
+          required: false
+          schema:
+            type: string
+            format: date-time
+          example: "2023-08-13T00:00:00Z"
+        - description: end_date
+          in: query
+          name: end date
+          required: false
+          schema:
+            type: string
+            format: date-time
+          example: "2023-08-20T00:00:00Z"
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/summary"
+          description: the Pulse summary
+components:
+  schemas:
+    summary:
+      type: object
+      required:
+        - summary
+      properties:
+        summary:
+          description: The AI generated summary that corresponds to the provided parameters
+          type: string
+      example:
+        summary: "You had a great week"
