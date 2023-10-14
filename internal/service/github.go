@@ -1,4 +1,4 @@
-package github
+package service
 
 import (
 	"context"
@@ -9,24 +9,27 @@ import (
 	"github.com/hashicorp/go-retryablehttp"
 )
 
-type Client struct {
+type GithubConfig struct {
+}
+
+type Github struct {
 	client *github.Client
 }
 
-func NewClient() *Client {
+func NewGithub(_ GithubConfig) *Github {
 	transport := cleanhttp.DefaultPooledTransport()
 	retryClient := retryablehttp.NewClient()
 	retryClient.Logger = slog.Default()
 	retryClient.RetryMax = 10
 	retryClient.HTTPClient.Transport = transport
 
-	return &Client{
+	return &Github{
 		client: github.NewClient(retryClient.StandardClient()),
 	}
 }
 
-func (c *Client) UserActivity(ctx context.Context, username string) (string, error) {
-	events, resp, err := c.client.Activity.ListEventsPerformedByUser(ctx, username, false, nil)
+func (g *Github) UserActivity(ctx context.Context, username string) (string, error) {
+	events, resp, err := g.client.Activity.ListEventsPerformedByUser(ctx, username, false, nil)
 	if err != nil {
 		return "", err
 	}

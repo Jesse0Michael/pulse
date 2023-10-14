@@ -31,7 +31,7 @@ func main() {
 		cancel()
 	}()
 
-	pulser := service.NewPulser(cfg.Service)
+	pulser := service.NewPulser()
 	srvr := server.New(cfg.Server, pulser)
 	go func() { log.Fatal(srvr.ListenAndServe()) }()
 	slog.With("port", cfg.Server.Port).Info("started Pulse API")

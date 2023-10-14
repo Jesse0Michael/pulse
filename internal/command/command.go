@@ -6,21 +6,20 @@ import (
 	"log/slog"
 	"os"
 
-	"github.com/jesse0michael/pulse/internal/ai/openai"
-	"github.com/jesse0michael/pulse/internal/collector/github"
+	"github.com/jesse0michael/pulse/internal/service"
 	"github.com/kelseyhightower/envconfig"
 	"github.com/spf13/cobra"
 )
 
 type Config struct {
 	Pool int `env:"POOL" default:"1"`
-	AI   openai.Config
+	AI   service.OpenAIConfig
 }
 
 type Github struct {
 	cfg      Config
-	client   *github.Client
-	ai       *openai.Client
+	client   *service.Github
+	ai       *service.OpenAI
 	output   string
 	Username string
 }
@@ -29,7 +28,7 @@ type Github struct {
 func NewGithub() *Github {
 	return &Github{
 		cfg:    Config{},
-		client: github.NewClient(),
+		client: service.NewGithub(service.GithubConfig{}),
 	}
 }
 
@@ -56,7 +55,7 @@ func (c *Github) Init(cmd *cobra.Command, args []string) error {
 	}
 
 	fmt.Println(c.cfg)
-	c.ai = openai.NewClient(c.cfg.AI)
+	c.ai = service.NewOpenAI(c.cfg.AI)
 
 	if len(args) > 0 {
 		c.Username = args[0]

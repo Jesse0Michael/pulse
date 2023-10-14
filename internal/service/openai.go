@@ -1,4 +1,4 @@
-package openai
+package service
 
 import (
 	"context"
@@ -7,22 +7,22 @@ import (
 	"github.com/sashabaranov/go-openai"
 )
 
-type Config struct {
+type OpenAIConfig struct {
 	Token string `envconfig:"OPENAI_TOKEN"`
 }
 
-type Client struct {
+type OpenAI struct {
 	client *openai.Client
 }
 
-func NewClient(cfg Config) *Client {
-	return &Client{
+func NewOpenAI(cfg OpenAIConfig) *OpenAI {
+	return &OpenAI{
 		client: openai.NewClient(cfg.Token),
 	}
 }
 
-func (c *Client) Summarize(ctx context.Context, activity string) (string, error) {
-	resp, err := c.client.CreateChatCompletion(ctx,
+func (o *OpenAI) Summarize(ctx context.Context, activity string) (string, error) {
+	resp, err := o.client.CreateChatCompletion(ctx,
 		openai.ChatCompletionRequest{
 			Model: openai.GPT3Dot5Turbo,
 			Messages: []openai.ChatCompletionMessage{
