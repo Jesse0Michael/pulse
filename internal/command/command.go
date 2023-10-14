@@ -3,6 +3,7 @@ package command
 import (
 	"context"
 	"fmt"
+	"log"
 	"log/slog"
 	"os"
 
@@ -66,8 +67,8 @@ func (c *Github) Init(cmd *cobra.Command, args []string) error {
 
 // Output will run after the execution of the command to write the results to StdOut
 func (c *Github) Output(cmd *cobra.Command, _ []string) {
-	l := slog.New(slog.NewTextHandler(os.Stdout, nil))
-	l.InfoContext(cmd.Context(), c.output)
+	log.SetOutput(os.Stdout)
+	log.Println(c.output)
 }
 
 // Run will execute the github pulse summary generation process
@@ -76,8 +77,9 @@ func (c *Github) Run(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
+	slog.With("content", content).DebugContext(ctx, "github user activity")
 
-	c.output, err = c.ai.Summarize(ctx, content)
+	c.output, err = c.ai.Summarize(ctx, c.Username, content)
 
 	return err
 }

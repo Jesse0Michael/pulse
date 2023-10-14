@@ -46,7 +46,7 @@ func main() {
 
 // initLog configures and sets the default logger.
 func initLog() {
-	handler := slog.NewJSONHandler(os.Stderr, &slog.HandlerOptions{
+	handler := slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{
 		Level: slog.LevelInfo,
 	})
 

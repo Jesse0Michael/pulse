@@ -2,7 +2,7 @@ package service
 
 import (
 	"context"
-	"log/slog"
+	"fmt"
 
 	"github.com/sashabaranov/go-openai"
 )
@@ -21,14 +21,14 @@ func NewOpenAI(cfg OpenAIConfig) *OpenAI {
 	}
 }
 
-func (o *OpenAI) Summarize(ctx context.Context, activity string) (string, error) {
+func (o *OpenAI) Summarize(ctx context.Context, username, activity string) (string, error) {
 	resp, err := o.client.CreateChatCompletion(ctx,
 		openai.ChatCompletionRequest{
 			Model: openai.GPT3Dot5Turbo,
 			Messages: []openai.ChatCompletionMessage{
 				{
 					Role:    openai.ChatMessageRoleUser,
-					Content: "Hello!",
+					Content: fmt.Sprintf("Summarize the following github activity for the username %s:\n%s", username, activity),
 				},
 			},
 		},
@@ -39,7 +39,6 @@ func (o *OpenAI) Summarize(ctx context.Context, activity string) (string, error)
 
 	var out string
 	for _, choice := range resp.Choices {
-		slog.Info("choice message", "content", choice.Message.Content)
 		out += choice.Message.Content + "\n"
 	}
 
