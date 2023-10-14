@@ -2,9 +2,11 @@ package command
 
 import (
 	"context"
+	"fmt"
 	"log/slog"
 	"os"
 
+	"github.com/jesse0michael/pulse/internal/ai/openai"
 	"github.com/jesse0michael/pulse/internal/collector/github"
 	"github.com/kelseyhightower/envconfig"
 	"github.com/spf13/cobra"
@@ -12,17 +14,21 @@ import (
 
 type Config struct {
 	Pool int `env:"POOL" default:"1"`
+	AI   openai.Config
 }
 
 type Github struct {
 	cfg      Config
 	client   *github.Client
+	ai       *openai.Client
+	output   string
 	Username string
 }
 
 // NewGithub creates a new Github service
 func NewGithub() *Github {
 	return &Github{
+		cfg:    Config{},
 		client: github.NewClient(),
 	}
 }
@@ -49,6 +55,9 @@ func (c *Github) Init(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
+	fmt.Println(c.cfg)
+	c.ai = openai.NewClient(c.cfg.AI)
+
 	if len(args) > 0 {
 		c.Username = args[0]
 	}
@@ -59,15 +68,17 @@ func (c *Github) Init(cmd *cobra.Command, args []string) error {
 // Output will run after the execution of the command to write the results to StdOut
 func (c *Github) Output(cmd *cobra.Command, _ []string) {
 	l := slog.New(slog.NewTextHandler(os.Stdout, nil))
-	l.InfoContext(cmd.Context(), "complete")
+	l.InfoContext(cmd.Context(), c.output)
 }
 
 // Run will execute the github pulse summary generation process
 func (c *Github) Run(ctx context.Context) error {
-	summary, err := c.client.UserActivity(c.Username)
+	content, err := c.client.UserActivity(ctx, c.Username)
 	if err != nil {
 		return err
 	}
 
-	return nil
+	c.output, err = c.ai.Summarize(ctx, content)
+
+	return err
 }
