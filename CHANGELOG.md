@@ -1,3 +1,14 @@
+## [1.0.1](https://github.com/Jesse0Michael/pulse/compare/v1.0.0...v1.0.1) (2023-10-16)
+
+### Chores
+
+- add Environment configuration to CLI usage ([d4fa0e9](https://github.com/Jesse0Michael/pulse/commit/d4fa0e9cf50290fad89ede172c687b20b1e696bb))
+- rename pulse cmd directory ([cb09a8b](https://github.com/Jesse0Michael/pulse/commit/cb09a8bcfee80771882ec7e3bf451c9a8b12f921))
+
+### Other
+
+- Merge branch 'main' of ssh://github.com/Jesse0Michael/pulse ([0b69300](https://github.com/Jesse0Michael/pulse/commit/0b6930019384a267bf68ff16695228dcfcfd9fc8))
+
 # 1.0.0 (2023-10-16)
 
 ### Bug Fixes
