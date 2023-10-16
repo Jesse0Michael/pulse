@@ -38,6 +38,13 @@ func (c *Github) Command() *cobra.Command {
 			return c.Run(cmd.Context())
 		},
 	}
+	cmd.SetUsageTemplate(cmd.UsageTemplate() + `
+Environment:
+  GITHUB_URL         the url for accessing the GitHub API
+  GITHUB_TOKEN       the authentication token to use with the GitHub API
+  OPENAI_URL         the url for accessing the OpenAI API
+  OPENAI_TOKEN       the authentication token to use with the OpenAI API
+`)
 
 	return cmd
 }
