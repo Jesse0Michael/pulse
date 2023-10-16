@@ -1,3 +1,17 @@
+## [1.0.2](https://github.com/Jesse0Michael/pulse/compare/v1.0.1...v1.0.2) (2023-10-16)
+
+### Bug Fixes
+
+- use correct directory to build cli ([fb211cf](https://github.com/Jesse0Michael/pulse/commit/fb211cf72ab8724a8ebce7cf1f935e5cedd8694c))
+
+### Chores
+
+- remove debug line ([23a7c54](https://github.com/Jesse0Michael/pulse/commit/23a7c54fce8a6c2394561345139ccd103d4d692f))
+
+### Other
+
+- Merge branch 'main' of ssh://github.com/Jesse0Michael/pulse ([9c90c8f](https://github.com/Jesse0Michael/pulse/commit/9c90c8f2718763672fcb988a84a2ae7145439593))
+
 ## [1.0.1](https://github.com/Jesse0Michael/pulse/compare/v1.0.0...v1.0.1) (2023-10-16)
 
 ### Chores
