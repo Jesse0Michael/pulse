@@ -1,3 +1,13 @@
+## [1.0.3](https://github.com/Jesse0Michael/pulse/compare/v1.0.2...v1.0.3) (2023-10-16)
+
+### Documentation
+
+- update README with application purpose, usage, and examples ([d62e9e9](https://github.com/Jesse0Michael/pulse/commit/d62e9e9a0d10e052b0bc8a22b2d40712622d910d))
+
+### Other
+
+- Merge branch 'main' of ssh://github.com/Jesse0Michael/pulse ([e3d9e20](https://github.com/Jesse0Michael/pulse/commit/e3d9e205bf86c74669608d8cc88354322072b32d))
+
 ## [1.0.2](https://github.com/Jesse0Michael/pulse/compare/v1.0.1...v1.0.2) (2023-10-16)
 
 ### Bug Fixes
