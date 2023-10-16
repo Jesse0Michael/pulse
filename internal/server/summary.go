@@ -4,6 +4,10 @@ import (
 	"net/http"
 )
 
+type Summary struct {
+	Summary string `json:"summary"`
+}
+
 func (s *Server) summary() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Add("Content-Type", "application/json")

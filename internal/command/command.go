@@ -2,9 +2,7 @@ package command
 
 import (
 	"context"
-	"fmt"
 	"log"
-	"log/slog"
 	"os"
 
 	"github.com/jesse0michael/pulse/internal/service"
@@ -13,24 +11,19 @@ import (
 )
 
 type Config struct {
-	Pool int `env:"POOL" default:"1"`
-	AI   service.OpenAIConfig
+	Github service.GithubConfig
+	AI     service.OpenAIConfig
 }
 
 type Github struct {
-	cfg      Config
-	client   *service.Github
-	ai       *service.OpenAI
+	pulser   *service.Pulser
 	output   string
 	Username string
 }
 
 // NewGithub creates a new Github service
 func NewGithub() *Github {
-	return &Github{
-		cfg:    Config{},
-		client: service.NewGithub(service.GithubConfig{}),
-	}
+	return &Github{}
 }
 
 // Command will return the cobra command structure that can be executed
@@ -51,12 +44,14 @@ func (c *Github) Command() *cobra.Command {
 
 // Init will initialize export dependencies
 func (c *Github) Init(cmd *cobra.Command, args []string) error {
-	if err := envconfig.Process("", &c.cfg); err != nil {
+	var cfg Config
+	if err := envconfig.Process("", &cfg); err != nil {
 		return err
 	}
 
-	fmt.Println(c.cfg)
-	c.ai = service.NewOpenAI(c.cfg.AI)
+	github := service.NewGithub(cfg.Github)
+	openAI := service.NewOpenAI(cfg.AI)
+	c.pulser = service.NewPulser(github, openAI)
 
 	if len(args) > 0 {
 		c.Username = args[0]
@@ -73,13 +68,7 @@ func (c *Github) Output(cmd *cobra.Command, _ []string) {
 
 // Run will execute the github pulse summary generation process
 func (c *Github) Run(ctx context.Context) error {
-	content, err := c.client.UserActivity(ctx, c.Username)
-	if err != nil {
-		return err
-	}
-	slog.With("content", content).DebugContext(ctx, "github user activity")
-
-	c.output, err = c.ai.Summarize(ctx, c.Username, content)
-
+	var err error
+	c.output, err = c.pulser.Summary(ctx, service.SummaryRequest{Username: c.Username})
 	return err
 }

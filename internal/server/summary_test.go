@@ -14,13 +14,13 @@ import (
 
 type MockPulser struct {
 	expected service.SummaryRequest
-	summary  *service.Summary
+	summary  string
 	err      error
 }
 
-func (m *MockPulser) Summary(ctx context.Context, req service.SummaryRequest) (*service.Summary, error) {
+func (m *MockPulser) Summary(ctx context.Context, req service.SummaryRequest) (string, error) {
 	if req != m.expected {
-		return nil, fmt.Errorf("unexpected req")
+		return "", fmt.Errorf("unexpected req")
 	}
 	return m.summary, m.err
 }

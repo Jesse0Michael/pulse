@@ -8,7 +8,6 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/jesse0michael/pulse/internal/config"
 	"github.com/jesse0michael/pulse/internal/server"
 	"github.com/jesse0michael/pulse/internal/service"
 	"github.com/kelseyhightower/envconfig"
@@ -16,7 +15,7 @@ import (
 
 func main() {
 	initLog()
-	var cfg config.Config
+	var cfg server.Config
 	if err := envconfig.Process("", &cfg); err != nil {
 		log.Fatal("failed to process config")
 	}
@@ -31,10 +30,12 @@ func main() {
 		cancel()
 	}()
 
-	pulser := service.NewPulser()
-	srvr := server.New(cfg.Server, pulser)
+	github := service.NewGithub(cfg.Github)
+	openAI := service.NewOpenAI(cfg.AI)
+	pulser := service.NewPulser(github, openAI)
+	srvr := server.New(cfg, pulser)
 	go func() { log.Fatal(srvr.ListenAndServe()) }()
-	slog.With("port", cfg.Server.Port).Info("started Pulse API")
+	slog.With("port", cfg.Port).Info("started Pulse API")
 
 	// Exit safely
 	<-ctx.Done()

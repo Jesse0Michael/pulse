@@ -12,12 +12,14 @@ import (
 )
 
 type Pulser interface {
-	Summary(ctx context.Context, req service.SummaryRequest) (*service.Summary, error)
+	Summary(ctx context.Context, req service.SummaryRequest) (string, error)
 }
 
 type Config struct {
 	Port    int           `envconfig:"PORT" default:"8080"`
 	Timeout time.Duration `envconfig:"TIMEOUT" default:"10s"`
+	Github  service.GithubConfig
+	AI      service.OpenAIConfig
 }
 
 type Server struct {
