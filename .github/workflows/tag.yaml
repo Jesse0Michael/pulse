@@ -17,4 +17,4 @@ jobs:
         with:
           release-branches: '["main"]'
         env:
-          GITHUB_TOKEN: ${{ secrets.PAT }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
