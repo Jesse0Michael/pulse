@@ -2,12 +2,13 @@ package service
 
 import (
 	"context"
-	"fmt"
+	"strings"
 
 	"github.com/sashabaranov/go-openai"
 )
 
 type OpenAIConfig struct {
+	URL   string `envconfig:"OPENAI_URL"`
 	Token string `envconfig:"OPENAI_TOKEN"`
 }
 
@@ -16,19 +17,24 @@ type OpenAI struct {
 }
 
 func NewOpenAI(cfg OpenAIConfig) *OpenAI {
+	config := openai.DefaultConfig(cfg.Token)
+	if cfg.URL != "" {
+		config.BaseURL = cfg.URL
+	}
+
 	return &OpenAI{
-		client: openai.NewClient(cfg.Token),
+		client: openai.NewClientWithConfig(config),
 	}
 }
 
-func (o *OpenAI) Summarize(ctx context.Context, username, activity string) (string, error) {
+func (o *OpenAI) Summarize(ctx context.Context, content string) (string, error) {
 	resp, err := o.client.CreateChatCompletion(ctx,
 		openai.ChatCompletionRequest{
 			Model: openai.GPT3Dot5Turbo,
 			Messages: []openai.ChatCompletionMessage{
 				{
 					Role:    openai.ChatMessageRoleUser,
-					Content: fmt.Sprintf("Summarize the following github activity for the username %s:\n%s", username, activity),
+					Content: content,
 				},
 			},
 		},
@@ -37,10 +43,10 @@ func (o *OpenAI) Summarize(ctx context.Context, username, activity string) (stri
 		return "", err
 	}
 
-	var out string
-	for _, choice := range resp.Choices {
-		out += choice.Message.Content + "\n"
+	out := make([]string, len(resp.Choices))
+	for i, choice := range resp.Choices {
+		out[i] = choice.Message.Content
 	}
 
-	return out, nil
+	return strings.Join(out, "\n"), nil
 }
