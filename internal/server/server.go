@@ -53,7 +53,7 @@ func New(cfg Config, pulser Pulser) *Server {
 }
 
 func (s *Server) route() {
-	s.router.HandleFunc("/summary", s.summary()).Methods("GET").Name("summary")
+	s.router.HandleFunc("/summary/github/users/{username}", s.summary()).Methods("GET").Name("githubUserSummary")
 }
 
 func notFound(w http.ResponseWriter, r *http.Request) {

@@ -2,16 +2,28 @@ openapi: 3.0.3
 info:
   title: Pulse API
   description: AI Empowered Insights
-  version: 0.0.0
+  version: 0.1.0
 servers:
   - description: Pulse Host
     url: https://localhost:8080/
+tags:
+  - name: Summary
+    description: Handles pulse summary requests
 paths:
-  /summary:
+  /summary/github/users/{username}:
     get:
-      description: Get Pulse summary
-      operationId: getSummary
+      tags:
+        - Summary
+      description: Get Pulse summary for Github user
+      operationId: getGithubUserSummary
       parameters:
+        - in: path
+          name: username
+          description: The username to target the summary for
+          required: true
+          schema:
+            type: string
+          example: "jesse0michael"
         - description: start_date
           in: query
           name: start date
