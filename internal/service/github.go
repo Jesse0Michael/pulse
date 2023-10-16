@@ -13,7 +13,7 @@ import (
 )
 
 type GithubConfig struct {
-	URL   string `envconfig:"GITHUB_URL" default:"https://api.github.com"`
+	URL   string `envconfig:"GITHUB_URL"`
 	Token string `envconfig:"GITHUB_TOKEN"`
 }
 
