@@ -1,0 +1,111 @@
+{
+    "repository_id": 98322462,
+    "push_id": 15061285839,
+    "size": 10,
+    "distinct_size": 10,
+    "ref": "refs/heads/master",
+    "head": "2ea667c69a388c85f5bee6164c76d3b39c9d3ac7",
+    "before": "3f6a72fa0e0642f064f5b62aa8b10eb1bebde46d",
+    "commits": [
+        {
+            "sha": "04f971bd0d5e96c971bd84a4e7f3e66ecf5e7b62",
+            "author": {
+                "email": "jesse.michael1234@gmail.com",
+                "name": "Jesse Michael"
+            },
+            "message": "feat: BREAKING CHANGE upgrade rest assured to v4",
+            "distinct": true,
+            "url": "https://api.github.com/repos/Jesse0Michael/go-rest-assured/commits/04f971bd0d5e96c971bd84a4e7f3e66ecf5e7b62"
+        },
+        {
+            "sha": "e3af4ccd4e2a911afe6951365f2196ee41c02266",
+            "author": {
+                "email": "jesse.michael1234@gmail.com",
+                "name": "Jesse Michael"
+            },
+            "message": "feat: export Serve method to start http listener\n\nRemove client context and error channel.\nRely on the caller of the package to appropriately call Serve",
+            "distinct": true,
+            "url": "https://api.github.com/repos/Jesse0Michael/go-rest-assured/commits/e3af4ccd4e2a911afe6951365f2196ee41c02266"
+        },
+        {
+            "sha": "7adaa3fbe3ad4ad6db034be15d423fb7776e0b46",
+            "author": {
+                "email": "jesse.michael1234@gmail.com",
+                "name": "Jesse Michael"
+            },
+            "message": "chore: upgrade to go 1.21",
+            "distinct": true,
+            "url": "https://api.github.com/repos/Jesse0Michael/go-rest-assured/commits/7adaa3fbe3ad4ad6db034be15d423fb7776e0b46"
+        },
+        {
+            "sha": "ac6be679ee426bb2fd1235ecb1f401ab2a6b8bd4",
+            "author": {
+                "email": "jesse.michael1234@gmail.com",
+                "name": "Jesse Michael"
+            },
+            "message": "feat: move to log/slog for logging",
+            "distinct": true,
+            "url": "https://api.github.com/repos/Jesse0Michael/go-rest-assured/commits/ac6be679ee426bb2fd1235ecb1f401ab2a6b8bd4"
+        },
+        {
+            "sha": "f44064258ee2405495f717e34f08892a6d231dc7",
+            "author": {
+                "email": "jesse.michael1234@gmail.com",
+                "name": "Jesse Michael"
+            },
+            "message": "fix: use google/uuid package",
+            "distinct": true,
+            "url": "https://api.github.com/repos/Jesse0Michael/go-rest-assured/commits/f44064258ee2405495f717e34f08892a6d231dc7"
+        },
+        {
+            "sha": "5503a7dc008f9385767c47556473c90dfe922921",
+            "author": {
+                "email": "jesse.michael1234@gmail.com",
+                "name": "Jesse Michael"
+            },
+            "message": "test: Serve rest assured client in tests",
+            "distinct": true,
+            "url": "https://api.github.com/repos/Jesse0Michael/go-rest-assured/commits/5503a7dc008f9385767c47556473c90dfe922921"
+        },
+        {
+            "sha": "ebce1b2bac5fe337a8604a563096912527490ebf",
+            "author": {
+                "email": "jesse.michael1234@gmail.com",
+                "name": "Jesse Michael"
+            },
+            "message": "chore: update license",
+            "distinct": true,
+            "url": "https://api.github.com/repos/Jesse0Michael/go-rest-assured/commits/ebce1b2bac5fe337a8604a563096912527490ebf"
+        },
+        {
+            "sha": "453d25892330d7520f57dd12e3c550cc4ff2285a",
+            "author": {
+                "email": "jesse.michael1234@gmail.com",
+                "name": "Jesse Michael"
+            },
+            "message": "feat: add NewClientServe function\n\nthat will create and serve the assured client",
+            "distinct": true,
+            "url": "https://api.github.com/repos/Jesse0Michael/go-rest-assured/commits/453d25892330d7520f57dd12e3c550cc4ff2285a"
+        },
+        {
+            "sha": "5abe58315dd85d4b90d4a7940ce1ba472f399219",
+            "author": {
+                "email": "jesse.michael1234@gmail.com",
+                "name": "Jesse Michael"
+            },
+            "message": "build: add docker labels",
+            "distinct": true,
+            "url": "https://api.github.com/repos/Jesse0Michael/go-rest-assured/commits/5abe58315dd85d4b90d4a7940ce1ba472f399219"
+        },
+        {
+            "sha": "2ea667c69a388c85f5bee6164c76d3b39c9d3ac7",
+            "author": {
+                "email": "jesse.michael1234@gmail.com",
+                "name": "Jesse Michael"
+            },
+            "message": "ci: update go version",
+            "distinct": true,
+            "url": "https://api.github.com/repos/Jesse0Michael/go-rest-assured/commits/2ea667c69a388c85f5bee6164c76d3b39c9d3ac7"
+        }
+    ]
+}

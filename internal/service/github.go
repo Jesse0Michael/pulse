@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
+	"net/url"
 	"strings"
 
 	"github.com/google/go-github/v54/github"
@@ -12,21 +13,33 @@ import (
 )
 
 type GithubConfig struct {
+	URL   string `envconfig:"GITHUB_URL" default:"https://api.github.com"`
+	Token string `envconfig:"GITHUB_TOKEN"`
 }
 
 type Github struct {
 	client *github.Client
 }
 
-func NewGithub(_ GithubConfig) *Github {
+func NewGithub(cfg GithubConfig) *Github {
 	transport := cleanhttp.DefaultPooledTransport()
 	retryClient := retryablehttp.NewClient()
 	retryClient.Logger = slog.Default()
 	retryClient.RetryMax = 10
 	retryClient.HTTPClient.Transport = transport
 
+	var client *github.Client
+	if cfg.Token != "" {
+		client = github.NewTokenClient(context.Background(), cfg.Token)
+	} else {
+		client = github.NewClient(retryClient.StandardClient())
+	}
+	if cfg.URL != "" {
+		client.BaseURL, _ = url.Parse(cfg.URL)
+	}
+
 	return &Github{
-		client: github.NewClient(retryClient.StandardClient()),
+		client: client,
 	}
 }
 
@@ -37,12 +50,14 @@ func (g *Github) UserActivity(ctx context.Context, username string) (string, err
 		return "", err
 	}
 	if resp != nil {
+		fmt.Println(resp.Request.URL)
 		slog.Debug(resp.Status)
 	}
 
 	var out string
 	for _, event := range events {
 		slog.Info("event", "id", event.GetID(), "type", event.GetType(), "repo", event.GetRepo(), "org", event.GetOrg())
+
 		if activity := eventActivity(event); activity != "" {
 			out += activity + "\n"
 		}
@@ -52,42 +67,51 @@ func (g *Github) UserActivity(ctx context.Context, username string) (string, err
 }
 
 func eventActivity(event *github.Event) string {
+	if event == nil {
+		return ""
+	}
+
+	payload, err := event.ParsePayload()
+	if err != nil {
+		return ""
+	}
+
 	switch event.GetType() {
 	case "PushEvent":
-		activity := fmt.Sprintf("pushed commits to repository %s", *event.Repo.Name)
-		payload, err := event.ParsePayload()
-		e, ok := payload.(*github.PushEvent)
-		if err != nil || !ok {
-			slog.With("error", err).Error("error parsing github event")
-			return activity
+		if e, ok := payload.(*github.PushEvent); ok && e != nil {
+			return parsePushEvent(*e, event.Repo.GetName())
 		}
-
-		commits := make([]string, len(e.Commits))
-		for i, commit := range e.Commits {
-			commits[i] = commit.GetMessage()
-		}
-
-		return fmt.Sprintf("%s\ncommit messages: %s", activity, strings.Join(commits, "\n"))
 	case "PullRequestEvent":
-		activity := fmt.Sprintf("pushed commits to repository %s", *event.Repo.Name)
-		payload, err := event.ParsePayload()
-		e, ok := payload.(*github.PullRequestEvent)
-		if err != nil || !ok {
-			slog.With("error", err).Error("error parsing github event")
+		if e, ok := payload.(*github.PullRequestEvent); ok && e != nil {
+			return parsePullRequestEvent(*e, event.Repo.GetName())
+		}
+	}
+	return ""
+}
+
+func parsePushEvent(e github.PushEvent, repository string) string {
+	activity := fmt.Sprintf("pushed commits to repository %s", repository)
+	if len(e.Commits) == 0 {
+		return activity
+	}
+
+	commits := make([]string, len(e.Commits))
+	for i, commit := range e.Commits {
+		commits[i] = commit.GetMessage()
+	}
+
+	return fmt.Sprintf("%s\ncommit messages: %s", activity, strings.Join(commits, "\n"))
+}
+
+func parsePullRequestEvent(e github.PullRequestEvent, repository string) string {
+	switch e.GetAction() {
+	case "opened":
+		activity := fmt.Sprintf("opened pull request in repository %s", repository)
+		if e.PullRequest == nil || e.PullRequest.Body == nil {
 			return activity
 		}
 
-		switch e.GetAction() {
-		case "opened":
-			activity := fmt.Sprintf("opened pull request in repository %s", *event.Repo.Name)
-			if e.PullRequest == nil || e.PullRequest.Body == nil {
-				return activity
-			}
-
-			return fmt.Sprintf("%s\nbody: %s", activity, *e.PullRequest.Body)
-		default:
-			return ""
-		}
+		return fmt.Sprintf("%s\nbody: %s", activity, *e.PullRequest.Body)
 	default:
 		return ""
 	}

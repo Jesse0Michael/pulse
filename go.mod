@@ -8,6 +8,7 @@ require (
 	github.com/gorilla/mux v1.8.0
 	github.com/hashicorp/go-cleanhttp v0.5.2
 	github.com/hashicorp/go-retryablehttp v0.7.4
+	github.com/jesse0michael/testhelpers v0.4.1
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/sashabaranov/go-openai v1.16.0
 	github.com/spf13/cobra v1.7.0

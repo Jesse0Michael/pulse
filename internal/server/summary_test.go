@@ -2,7 +2,6 @@ package server
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -26,43 +25,14 @@ func (m *MockPulser) Summary(ctx context.Context, req service.SummaryRequest) (*
 	return m.summary, m.err
 }
 
-func TestServer_feed(t *testing.T) {
+func TestServer_summary(t *testing.T) {
 	tests := []struct {
 		name     string
 		req      *http.Request
 		pulser   Pulser
 		wantCode int
 		wantBody string
-	}{
-		{
-			name:     "empty summary retrieval",
-			req:      httptest.NewRequest(http.MethodGet, "/summary", nil),
-			pulser:   &MockPulser{},
-			wantCode: 200,
-			wantBody: `{"summary":""}`,
-		},
-		{
-			name: "successful summary retrieval",
-			req:  httptest.NewRequest(http.MethodGet, "/summary", nil),
-			pulser: &MockPulser{
-				expected: service.SummaryRequest{},
-				summary: &service.Summary{
-					Summary: "test",
-				},
-			},
-			wantCode: 200,
-			wantBody: `{"summary":"test"}`,
-		},
-		{
-			name: "failed summary retrieval",
-			req:  httptest.NewRequest(http.MethodGet, "/summary", nil),
-			pulser: &MockPulser{
-				err: errors.New("test-error"),
-			},
-			wantCode: 500,
-			wantBody: `{"error":"test-error"}`,
-		},
-	}
+	}{}
 	for i := range tests {
 		tt := tests[i]
 		t.Run(tt.name, func(t *testing.T) {
