@@ -17,7 +17,7 @@ gen: dependencies
 	go generate ./...
 
 build-cli: 
-	go build -o ./bin/pulse ./cmd/pulse-cli
+	go build -o ./bin/pulse ./cmd/pulse
 	
 #################################################################################
 # TEST COMMANDS
