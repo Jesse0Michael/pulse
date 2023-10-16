@@ -50,7 +50,6 @@ func (g *Github) UserActivity(ctx context.Context, username string) (string, err
 		return "", err
 	}
 	if resp != nil {
-		fmt.Println(resp.Request.URL)
 		slog.Debug(resp.Status)
 	}
 
