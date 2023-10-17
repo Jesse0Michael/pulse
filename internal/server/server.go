@@ -17,7 +17,7 @@ type Pulser interface {
 
 type Config struct {
 	Port    int           `envconfig:"PORT" default:"8080"`
-	Timeout time.Duration `envconfig:"TIMEOUT" default:"10s"`
+	Timeout time.Duration `envconfig:"TIMEOUT" default:"30s"`
 	Github  service.GithubConfig
 	AI      service.OpenAIConfig
 }
