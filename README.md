@@ -6,9 +6,11 @@ Add parameters to narrow the scope of the data.
 
 ## Data Sources
 
-### Github
+**Github**
+
 Pulse uses the [Github API](https://docs.github.com/en/rest) to pull activity from the [ListEventsPerformedByUser](https://docs.github.com/en/rest/activity/events#list-events-for-the-authenticated-user) endpoint.
-#### Events:
+
+**Events:**
 - PushEvent
 - PullRequestEvent
 
@@ -16,18 +18,19 @@ These events are parsed and formatted into the content of our summary generation
 
 ## Generative AI
 
-### OpenAI
+**OpenAI**
+
 Pulse uses the [OpenAI API](https://platform.openai.com/docs/api-reference) to generate summaries from the [CreateChatCompletions](https://platform.openai.com/docs/api-reference/chat/create) endpoint using the  data pulled from the data sources.
 
 
 ## Pulse CLI
 
-### Installation
+**Installation**
 ```go
 go install github.com/jesse0michael/pulse/cmd/pulse@latest
 ```
 
-### Usage
+**Usage**
 ```
 generate a summary of a github user's activity
 
@@ -44,7 +47,7 @@ Environment:
   OPENAI_TOKEN       the authentication token to use with the OpenAI API
 ```
 
-### Example
+**Example**
 ``` bash
 pulse github jesse0michael
 ```
