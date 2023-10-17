@@ -1,3 +1,17 @@
+## [1.0.4](https://github.com/Jesse0Michael/pulse/compare/v1.0.3...v1.0.4) (2023-10-17)
+
+### Bug Fixes
+
+- update default server timeout ([e7d8bf3](https://github.com/Jesse0Michael/pulse/commit/e7d8bf30a90b1f8200bed3c012a72cba0083bde6))
+
+### Documentation
+
+- change README.md syntax ([9f7ea7c](https://github.com/Jesse0Michael/pulse/commit/9f7ea7c2dd6d5b3f3556cd5e929b17976801be40))
+
+### Tests
+
+- add behavioral tests for the pulse cli ([8f6d16d](https://github.com/Jesse0Michael/pulse/commit/8f6d16da842b2361c05bb3aec77764c764270ae1))
+
 ## [1.0.3](https://github.com/Jesse0Michael/pulse/compare/v1.0.2...v1.0.3) (2023-10-16)
 
 ### Documentation
