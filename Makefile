@@ -33,3 +33,6 @@ cover:
 
 vuln: dependencies
 	govulncheck -test ./...
+
+behavior: build-cli
+	go test ./test/...  -tags=behavior
