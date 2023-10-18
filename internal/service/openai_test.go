@@ -18,7 +18,7 @@ func TestOpenAI_Summarize(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "list user activity",
+			name: "summarize content",
 			server: testserver.New(
 				testserver.Handler{Path: "/chat/completions", Status: http.StatusOK, Response: resp},
 			),
@@ -26,7 +26,7 @@ func TestOpenAI_Summarize(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "failed list user activity",
+			name: "failed summarize content",
 			server: testserver.New(
 				testserver.Handler{Path: "/chat/completions", Status: http.StatusTooManyRequests, Response: []byte(`{"message": "Too Many Requests"}`)},
 			),

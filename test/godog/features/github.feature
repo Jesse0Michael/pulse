@@ -5,7 +5,7 @@ Feature: github cli command
     Given I have a clean rest assured environment
 
   Scenario: github summary for user
-    Given rest assured returns "testdata/assured/github/listevents.json" on a "GET" to "/users/jesse0michael/events"
-    And rest assured returns "testdata/assured/openai/chatcompletion.json" on a "GET" to "/chat/completions"
+    Given rest assured returns "testdata/assured/github/listevents.json" on a "GET" to "users/jesse0michael/events"
+    And rest assured returns "testdata/assured/openai/chatcompletion.json" on a "POST" to "chat/completions"
     When I run the pulse github command on user "jesse0michael"
     Then the pulse output should equal "testdata/github/expected.txt"

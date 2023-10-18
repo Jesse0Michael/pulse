@@ -17,7 +17,7 @@ func (s *Steps) iRunThePulseGithubCommandOnUser(ctx context.Context, user string
 	var stdout, stderr bytes.Buffer
 	cmd.Stdout = &stdout
 	cmd.Stderr = &stderr
-	cmd.Env = append(os.Environ(), fmt.Sprintf("GITHUB_URL=%s/", s.client.URL()), fmt.Sprintf("OPENAI_URL=%s/", s.client.URL()))
+	cmd.Env = append(os.Environ(), fmt.Sprintf("GITHUB_URL=%s/", s.client.URL()), fmt.Sprintf("OPENAI_URL=%s", s.client.URL()))
 
 	err := cmd.Run()
 	output := stdout.String()

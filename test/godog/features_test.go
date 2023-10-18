@@ -3,7 +3,6 @@
 package godog
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/cucumber/godog"
@@ -20,7 +19,6 @@ func TestFeatures(t *testing.T) {
 			TestingT: t, // Testing instance that will run subtests.
 		},
 	}
-	fmt.Println("Running feature tests...")
 
 	if suite.Run() != 0 {
 		t.Fatal("non-zero status returned, failed to run feature tests")
