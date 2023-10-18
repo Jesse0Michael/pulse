@@ -1,3 +1,9 @@
+## [1.0.5](https://github.com/Jesse0Michael/pulse/compare/v1.0.4...v1.0.5) (2023-10-18)
+
+### Bug Fixes
+
+- update text fixtures ([6bdda6d](https://github.com/Jesse0Michael/pulse/commit/6bdda6de58042c541f937474902457cd75b68d20))
+
 ## [1.0.4](https://github.com/Jesse0Michael/pulse/compare/v1.0.3...v1.0.4) (2023-10-17)
 
 ### Bug Fixes
