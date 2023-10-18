@@ -1,0 +1,37 @@
+name: Test Code Base
+on:
+  push:
+    branches-ignore:
+      - "main"
+
+jobs:
+  build:
+    name: Lint Code Base
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Setup Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: stable
+
+      - name: Lint Code Base
+        uses: golangci/golangci-lint-action@v3
+        with:
+          version: latest
+
+      - name: Ensure Generated Code
+        run: |
+          go install github.com/golang/mock/mockgen@v1.6.0
+          go generate ./... && git diff --exit-code
+
+      - name: Run Unit Test
+        run: |
+          go test ./...
+
+      - name: Check Vulnerabilities
+        run: |
+          go install golang.org/x/vuln/cmd/govulncheck@latest
+          govulncheck -test ./...
