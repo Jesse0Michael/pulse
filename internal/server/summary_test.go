@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -32,7 +33,33 @@ func TestServer_summary(t *testing.T) {
 		pulser   Pulser
 		wantCode int
 		wantBody string
-	}{}
+	}{
+		{
+			name: "successful summary",
+			req:  httptest.NewRequest(http.MethodGet, "/summary/github/users/jesse0michael", nil),
+			pulser: &MockPulser{
+				expected: service.SummaryRequest{
+					Username: "jesse0michael",
+				},
+				summary: "Overall, the user jesse0michael has been actively working on multiple repositories",
+			},
+			wantCode: http.StatusOK,
+			wantBody: `{"summary":"Overall, the user jesse0michael has been actively working on multiple repositories"}`,
+		},
+		{
+			name: "failed summary",
+			req:  httptest.NewRequest(http.MethodGet, "/summary/github/users/jesse0michael", nil),
+			pulser: &MockPulser{
+				expected: service.SummaryRequest{
+					Username: "jesse0michael",
+				},
+				summary: "",
+				err:     errors.New("test-error"),
+			},
+			wantCode: http.StatusInternalServerError,
+			wantBody: `{"error":"test-error"}`,
+		},
+	}
 	for i := range tests {
 		tt := tests[i]
 		t.Run(tt.name, func(t *testing.T) {
@@ -40,7 +67,7 @@ func TestServer_summary(t *testing.T) {
 
 			resp := httptest.NewRecorder()
 			router := mux.NewRouter()
-			router.HandleFunc("/summary", s.summary())
+			router.HandleFunc("/summary/github/users/{username}", s.summary())
 			router.ServeHTTP(resp, tt.req)
 
 			result := resp.Result()

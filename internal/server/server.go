@@ -25,7 +25,6 @@ type Config struct {
 type Server struct {
 	*http.Server
 	router *mux.Router
-	client *http.Client
 	pulser Pulser
 }
 
@@ -43,7 +42,6 @@ func New(cfg Config, pulser Pulser) *Server {
 			ReadTimeout: cfg.Timeout,
 		},
 		router: router,
-		client: http.DefaultClient,
 		pulser: pulser,
 	}
 
