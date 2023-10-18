@@ -1,3 +1,21 @@
+## [1.0.6](https://github.com/Jesse0Michael/pulse/compare/v1.0.5...v1.0.6) (2023-10-18)
+
+### Bug Fixes
+
+- add summary endpoint implementation ([dbc5101](https://github.com/Jesse0Michael/pulse/commit/dbc510185147a520dbcc17dc01d0a384c73b2b64))
+
+### Chores
+
+- address linter issues ([c221064](https://github.com/Jesse0Michael/pulse/commit/c2210641814b9fbf9ec88b052ff38ca021919fcb))
+
+### Continuous Integration
+
+- add linter to configuration ([ddcbf23](https://github.com/Jesse0Michael/pulse/commit/ddcbf23b0fdd1a5c16a600fc1c76cb68d9eab58c))
+- lint with GO ([21fa359](https://github.com/Jesse0Michael/pulse/commit/21fa359575c7568772df499764c286427e53e111))
+- separate linting and testing jobs ([885e7c8](https://github.com/Jesse0Michael/pulse/commit/885e7c892567e3667d82d0ec06a891296f01f376))
+- update test CI ([e35f973](https://github.com/Jesse0Michael/pulse/commit/e35f9737b53413b5f5e388fa5ba15386df19ffcb))
+- validate all codebase ([681f60c](https://github.com/Jesse0Michael/pulse/commit/681f60ca7992825d016f68df4975cc0f47b2c10c))
+
 ## [1.0.5](https://github.com/Jesse0Michael/pulse/compare/v1.0.4...v1.0.5) (2023-10-18)
 
 ### Bug Fixes
