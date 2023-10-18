@@ -4,12 +4,13 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"log"
 	"os"
 	"os/exec"
 )
 
 func (s *Steps) iRunThePulseGithubCommandOnUser(ctx context.Context, user string) (context.Context, error) {
-	cmd := exec.Command( // nolint:gosec
+	cmd := exec.Command(
 		s.cfg.PulseCLIPath,
 		"github",
 		user,
@@ -21,8 +22,8 @@ func (s *Steps) iRunThePulseGithubCommandOnUser(ctx context.Context, user string
 
 	err := cmd.Run()
 	output := stdout.String()
-	fmt.Println(stderr.String())
-	fmt.Println(output)
+	log.Println(stderr.String())
+	log.Println(output)
 	ctx = context.WithValue(ctx, outputContextKey, output)
 
 	return ctx, err

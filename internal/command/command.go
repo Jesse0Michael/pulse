@@ -21,12 +21,12 @@ type Github struct {
 	Username string
 }
 
-// NewGithub creates a new Github service
+// NewGithub creates a new Github service.
 func NewGithub() *Github {
 	return &Github{}
 }
 
-// Command will return the cobra command structure that can be executed
+// Command will return the cobra command structure that can be executed.
 func (c *Github) Command() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "github [username]",
@@ -49,8 +49,8 @@ Environment:
 	return cmd
 }
 
-// Init will initialize export dependencies
-func (c *Github) Init(cmd *cobra.Command, args []string) error {
+// Init will initialize export dependencies.
+func (c *Github) Init(_ *cobra.Command, args []string) error {
 	var cfg Config
 	if err := envconfig.Process("", &cfg); err != nil {
 		return err
@@ -67,13 +67,13 @@ func (c *Github) Init(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-// Output will run after the execution of the command to write the results to StdOut
-func (c *Github) Output(cmd *cobra.Command, _ []string) {
+// Output will run after the execution of the command to write the results to StdOut.
+func (c *Github) Output(_ *cobra.Command, _ []string) {
 	log.SetOutput(os.Stdout)
 	log.Println(c.output)
 }
 
-// Run will execute the github pulse summary generation process
+// Run will execute the github pulse summary generation process.
 func (c *Github) Run(ctx context.Context) error {
 	var err error
 	c.output, err = c.pulser.Summary(ctx, service.SummaryRequest{Username: c.Username})

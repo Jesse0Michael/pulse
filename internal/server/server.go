@@ -54,13 +54,13 @@ func (s *Server) route() {
 	s.router.HandleFunc("/summary/github/users/{username}", s.summary()).Methods("GET").Name("githubUserSummary")
 }
 
-func notFound(w http.ResponseWriter, r *http.Request) {
+func notFound(w http.ResponseWriter, _ *http.Request) {
 	w.WriteHeader(http.StatusNotFound)
 	w.Header().Set("Content-Type", "application/json")
 	_, _ = w.Write([]byte(`{"error":"page not found"}`))
 }
 
-func notAllowed(w http.ResponseWriter, r *http.Request) {
+func notAllowed(w http.ResponseWriter, _ *http.Request) {
 	w.WriteHeader(http.StatusMethodNotAllowed)
 	w.Header().Set("Content-Type", "application/json")
 	_, _ = w.Write([]byte(`{"error":"method not allowed"}`))

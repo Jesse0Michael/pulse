@@ -19,7 +19,7 @@ type MockPulser struct {
 	err      error
 }
 
-func (m *MockPulser) Summary(ctx context.Context, req service.SummaryRequest) (string, error) {
+func (m *MockPulser) Summary(_ context.Context, req service.SummaryRequest) (string, error) {
 	if req != m.expected {
 		return "", fmt.Errorf("unexpected req")
 	}
