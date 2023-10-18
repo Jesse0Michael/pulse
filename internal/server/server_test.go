@@ -18,7 +18,7 @@ func TestNew(t *testing.T) {
 func TestServer_route(t *testing.T) {
 	server := New(Config{}, nil)
 
-	expected := []string{"summary"}
+	expected := []string{"githubUserSummary"}
 	received := []string{}
 
 	_ = server.router.Walk(func(route *mux.Route, router *mux.Router, ancestors []*mux.Route) error {
