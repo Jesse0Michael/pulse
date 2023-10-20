@@ -6,6 +6,7 @@ import (
 	"log/slog"
 	"net/url"
 	"strings"
+	"time"
 
 	"github.com/google/go-github/v54/github"
 	"github.com/hashicorp/go-cleanhttp"
@@ -43,7 +44,8 @@ func NewGithub(cfg GithubConfig) *Github {
 	}
 }
 
-func (g *Github) UserActivity(ctx context.Context, username, organization, repository string) (string, error) {
+func (g *Github) UserActivity(ctx context.Context, username, organization, repository string,
+	startDate, endDate *time.Time) (string, error) {
 	opts := github.ListOptions{}
 	events, resp, err := g.client.Activity.ListEventsPerformedByUser(ctx, username, false, &opts)
 	if err != nil {
@@ -59,6 +61,12 @@ func (g *Github) UserActivity(ctx context.Context, username, organization, repos
 			continue
 		}
 		if repository != "" && !strings.HasSuffix(event.GetRepo().GetName(), repository) {
+			continue
+		}
+		if startDate != nil && event.GetCreatedAt().Before(*startDate) {
+			continue
+		}
+		if endDate != nil && event.GetCreatedAt().After(*endDate) {
 			continue
 		}
 		slog.Info("event", "id", event.GetID(), "type", event.GetType(), "repo", event.GetRepo(), "org", event.GetOrg())

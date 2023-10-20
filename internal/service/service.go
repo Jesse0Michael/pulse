@@ -4,12 +4,15 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
+	"time"
 )
 
 type SummaryRequest struct {
 	Username     string
 	Organization string
 	Repository   string
+	StartDate    *time.Time
+	EndDate      *time.Time
 }
 
 type Pulser struct {
@@ -25,7 +28,7 @@ func NewPulser(github *Github, openAI *OpenAI) *Pulser {
 }
 
 func (p *Pulser) Summary(ctx context.Context, req SummaryRequest) (string, error) {
-	content, err := p.github.UserActivity(ctx, req.Username, req.Organization, req.Repository)
+	content, err := p.github.UserActivity(ctx, req.Username, req.Organization, req.Repository, req.StartDate, req.EndDate)
 	if err != nil {
 		return "", err
 	}

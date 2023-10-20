@@ -7,6 +7,7 @@ import (
 	"os"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/google/go-github/v54/github"
 	"github.com/jesse0michael/testhelpers/pkg/testserver"
@@ -218,14 +219,18 @@ update dependencies and documentation
 
 func TestGithub_UserActivity(t *testing.T) {
 	listEvents, _ := os.ReadFile("testdata/github_listevents.json")
+	startDate, _ := time.Parse(time.RFC3339, "2023-09-12T00:00:01Z")
+	endDate, _ := time.Parse(time.RFC3339, "2023-09-13T23:59:59Z")
 	tests := []struct {
-		name    string
-		token   string
-		org     string
-		repo    string
-		server  *testserver.Server
-		want    string
-		wantErr bool
+		name      string
+		token     string
+		org       string
+		repo      string
+		startDate *time.Time
+		endDate   *time.Time
+		server    *testserver.Server
+		want      string
+		wantErr   bool
 	}{
 		{
 			name:  "list user activity",
@@ -360,6 +365,24 @@ commit messages: chore: update twitter and insta package
 			wantErr: false,
 		},
 		{
+			name:      "list user activity: date filter",
+			token:     "test-token",
+			startDate: &startDate,
+			endDate:   &endDate,
+			server: testserver.New(
+				testserver.Handler{Path: "/users/test-user/events", Status: http.StatusOK, Response: listEvents},
+			),
+			want: `pushed commits to repository Jesse0Michael/fetcher
+commit messages: fix: disable Instagram feed
+pushed commits to repository Jesse0Michael/fetcher
+commit messages: feat: add Untappd feed support
+Merge branch 'main' of ssh://github.com/Jesse0Michael/fetcher
+pushed commits to repository Jesse0Michael/fetcher
+commit messages: chore: update twitter and insta package
+`,
+			wantErr: false,
+		},
+		{
 			name: "failed list user activity",
 			server: testserver.New(
 				testserver.Handler{Path: "/users/test-user/events", Status: http.StatusNotFound, Response: []byte(`{"message": "Not Found"}`)},
@@ -371,7 +394,7 @@ commit messages: chore: update twitter and insta package
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := NewGithub(GithubConfig{URL: tt.server.URL + "/", Token: tt.token})
-			got, err := g.UserActivity(context.TODO(), "test-user", tt.org, tt.repo)
+			got, err := g.UserActivity(context.TODO(), "test-user", tt.org, tt.repo, tt.startDate, tt.endDate)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Github.UserActivity() error = %v, wantErr %v", err, tt.wantErr)
 				return
