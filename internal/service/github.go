@@ -43,7 +43,7 @@ func NewGithub(cfg GithubConfig) *Github {
 	}
 }
 
-func (g *Github) UserActivity(ctx context.Context, username string) (string, error) {
+func (g *Github) UserActivity(ctx context.Context, username, organization, repository string) (string, error) {
 	opts := github.ListOptions{}
 	events, resp, err := g.client.Activity.ListEventsPerformedByUser(ctx, username, false, &opts)
 	if err != nil {
@@ -55,6 +55,12 @@ func (g *Github) UserActivity(ctx context.Context, username string) (string, err
 
 	var out string
 	for _, event := range events {
+		if organization != "" && !strings.HasPrefix(event.GetRepo().GetName(), organization) {
+			continue
+		}
+		if repository != "" && !strings.HasSuffix(event.GetRepo().GetName(), repository) {
+			continue
+		}
 		slog.Info("event", "id", event.GetID(), "type", event.GetType(), "repo", event.GetRepo(), "org", event.GetOrg())
 
 		if activity := eventActivity(event); activity != "" {
