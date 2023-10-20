@@ -1,3 +1,16 @@
+# [1.1.0](https://github.com/Jesse0Michael/pulse/compare/v1.0.6...v1.1.0) (2023-10-20)
+
+### Continuous Integration
+
+- add behavioral test job ([f5dd7f0](https://github.com/Jesse0Michael/pulse/commit/f5dd7f0b673634e6e4bbaad1a4349660883bab8f))
+
+### Features
+
+- add organization and repository filter ([6744aab](https://github.com/Jesse0Michael/pulse/commit/6744aab7f3a3836d8283e03d8d369d2ca899b6dd))
+- add organization, repository, startDate, and endDate api params ([fa74484](https://github.com/Jesse0Michael/pulse/commit/fa7448499f8b1ff90df0ce3d998c2904084e79e6))
+- add organization, repository, startDate, and endDate cli parameters ([c49338f](https://github.com/Jesse0Michael/pulse/commit/c49338f6e570b43578ae5cb6eec46ca47cd6d7b8))
+- add startDate and endDate filter ([a62e646](https://github.com/Jesse0Michael/pulse/commit/a62e64665916a285d9f0b5a03b9a8065b6f09944))
+
 ## [1.0.6](https://github.com/Jesse0Michael/pulse/compare/v1.0.5...v1.0.6) (2023-10-18)
 
 ### Bug Fixes
