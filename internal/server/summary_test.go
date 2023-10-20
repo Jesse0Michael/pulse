@@ -6,7 +6,9 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"reflect"
 	"testing"
+	"time"
 
 	"github.com/gorilla/mux"
 	"github.com/jesse0michael/pulse/internal/service"
@@ -20,13 +22,15 @@ type MockPulser struct {
 }
 
 func (m *MockPulser) Summary(_ context.Context, req service.SummaryRequest) (string, error) {
-	if req != m.expected {
+	if !reflect.DeepEqual(req, m.expected) {
 		return "", fmt.Errorf("unexpected req")
 	}
 	return m.summary, m.err
 }
 
 func TestServer_summary(t *testing.T) {
+	startDate, _ := time.Parse(time.RFC3339, "2023-09-12T00:00:01Z")
+	endDate, _ := time.Parse(time.RFC3339, "2023-09-13T23:59:59Z")
 	tests := []struct {
 		name     string
 		req      *http.Request
@@ -40,6 +44,22 @@ func TestServer_summary(t *testing.T) {
 			pulser: &MockPulser{
 				expected: service.SummaryRequest{
 					Username: "jesse0michael",
+				},
+				summary: "Overall, the user jesse0michael has been actively working on multiple repositories",
+			},
+			wantCode: http.StatusOK,
+			wantBody: `{"summary":"Overall, the user jesse0michael has been actively working on multiple repositories"}`,
+		},
+		{
+			name: "successful summary: with params",
+			req:  httptest.NewRequest(http.MethodGet, "/summary/github/users/jesse0michael?organization=Jesse0Michael&repository=pulse&startDate=2023-09-12T00:00:01Z&endDate=2023-09-13T23:59:59Z", nil),
+			pulser: &MockPulser{
+				expected: service.SummaryRequest{
+					Username:     "jesse0michael",
+					Organization: "Jesse0Michael",
+					Repository:   "pulse",
+					StartDate:    &startDate,
+					EndDate:      &endDate,
 				},
 				summary: "Overall, the user jesse0michael has been actively working on multiple repositories",
 			},
