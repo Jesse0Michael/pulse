@@ -38,7 +38,11 @@ Usage:
    github [username] [flags]
 
 Flags:
-  -h, --help   help for github
+  --organization string       filter results on an organization
+  --repository string         filter results on a repository
+  --startDate string          filter results after a start date
+  --endDate string            filter results before an end date
+  -h, --help                  help for github
 
 Environment:
   GITHUB_URL         the url for accessing the GitHub API

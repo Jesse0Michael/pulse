@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"os"
+	"time"
 
 	"github.com/jesse0michael/pulse/internal/service"
 	"github.com/kelseyhightower/envconfig"
@@ -16,9 +17,13 @@ type Config struct {
 }
 
 type Github struct {
-	pulser   *service.Pulser
-	output   string
-	Username string
+	pulser       *service.Pulser
+	output       string
+	Username     string
+	Organization string
+	Repository   string
+	StartDate    *time.Time
+	EndDate      *time.Time
 }
 
 // NewGithub creates a new Github service.
@@ -38,6 +43,12 @@ func (c *Github) Command() *cobra.Command {
 			return c.Run(cmd.Context())
 		},
 	}
+
+	cmd.Flags().StringVar(&c.Organization, "organization", "", "filter results on an organization")
+	cmd.Flags().StringVar(&c.Repository, "repository", "", "filter results on a repository")
+	cmd.Flags().String("startDate", "", "filter results after a start date")
+	cmd.Flags().String("endDate", "", "filter results before an end date")
+
 	cmd.SetUsageTemplate(cmd.UsageTemplate() + `
 Environment:
   GITHUB_URL         the url for accessing the GitHub API
@@ -50,7 +61,7 @@ Environment:
 }
 
 // Init will initialize export dependencies.
-func (c *Github) Init(_ *cobra.Command, args []string) error {
+func (c *Github) Init(cmd *cobra.Command, args []string) error {
 	var cfg Config
 	if err := envconfig.Process("", &cfg); err != nil {
 		return err
@@ -62,6 +73,17 @@ func (c *Github) Init(_ *cobra.Command, args []string) error {
 
 	if len(args) > 0 {
 		c.Username = args[0]
+	}
+
+	if b, err := cmd.Flags().GetString("startDate"); err == nil {
+		if d, err := time.Parse(time.RFC3339, b); err == nil {
+			c.StartDate = &d
+		}
+	}
+	if b, err := cmd.Flags().GetString("endDate"); err == nil {
+		if d, err := time.Parse(time.RFC3339, b); err == nil {
+			c.EndDate = &d
+		}
 	}
 
 	return nil
@@ -76,6 +98,12 @@ func (c *Github) Output(_ *cobra.Command, _ []string) {
 // Run will execute the github pulse summary generation process.
 func (c *Github) Run(ctx context.Context) error {
 	var err error
-	c.output, err = c.pulser.Summary(ctx, service.SummaryRequest{Username: c.Username})
+	c.output, err = c.pulser.Summary(ctx, service.SummaryRequest{
+		Username:     c.Username,
+		Organization: c.Organization,
+		Repository:   c.Repository,
+		StartDate:    c.StartDate,
+		EndDate:      c.EndDate,
+	})
 	return err
 }
