@@ -35,6 +35,7 @@ func main() {
 	root.SetHelpCommand(&cobra.Command{Hidden: true})
 	root.AddCommand(
 		command.NewGithub().Command(),
+		command.NewAudio().Command(),
 	)
 
 	err := root.ExecuteContext(ctx)

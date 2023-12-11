@@ -20,7 +20,9 @@ These events are parsed and formatted into the content of our summary generation
 
 **OpenAI**
 
-Pulse uses the [OpenAI API](https://platform.openai.com/docs/api-reference) to generate summaries from the [CreateChatCompletions](https://platform.openai.com/docs/api-reference/chat/create) endpoint using the  data pulled from the data sources.
+Pulse uses the [OpenAI API](https://platform.openai.com/docs/api-reference) to generate AI insights.
+[CreateChatCompletions](https://platform.openai.com/docs/api-reference/chat/create) is used to generate summaries from the data pulled from the data sources and transcriptions.
+[CreateTranscription](https://platform.openai.com/docs/api-reference/audio/createTranscription) is used to convert audio to text to use as a data source.
 
 
 ## Pulse CLI
@@ -32,8 +34,36 @@ go install github.com/jesse0michael/pulse/cmd/pulse@latest
 
 **Usage**
 ```
-generate a summary of a github user's activity
+CLI for pulse: AI Empowered Insights
 
+Available Commands:
+  audio       generate a summary of the audio files
+  github      generate a summary of a github user's activity
+```
+
+**audio**
+```
+Usage:
+   github [file(s)] [flags]
+
+Flags:
+  -h, --help                  help for audio
+
+Environment:
+  OPENAI_URL         the url for accessing the OpenAI API
+  OPENAI_TOKEN       the authentication token to use with the OpenAI API
+```
+
+
+**Example**
+``` bash
+pulse audio example.m4a
+```
+>Alright, this is Dungeons & Dragons, I am the DM. This is Crystal, the goblin. This is Cedric, Starfall, the elf that is magic. Alright. Previously. Previously on Dungeons & Dragons....
+
+
+**github**
+```
 Usage:
    github [username] [flags]
 

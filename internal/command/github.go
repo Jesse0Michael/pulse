@@ -11,7 +11,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-type Config struct {
+type GithubConfig struct {
 	Github service.GithubConfig
 	AI     service.OpenAIConfig
 }
@@ -60,9 +60,9 @@ Environment:
 	return cmd
 }
 
-// Init will initialize export dependencies.
+// Init will initialize GitHub dependencies.
 func (c *Github) Init(cmd *cobra.Command, args []string) error {
-	var cfg Config
+	var cfg GithubConfig
 	if err := envconfig.Process("", &cfg); err != nil {
 		return err
 	}

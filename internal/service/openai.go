@@ -50,3 +50,18 @@ func (o *OpenAI) Summarize(ctx context.Context, content string) (string, error) 
 
 	return strings.Join(out, "\n"), nil
 }
+
+func (o *OpenAI) Transcribe(ctx context.Context, file string) (string, error) {
+	resp, err := o.client.CreateTranscription(ctx,
+		openai.AudioRequest{
+			FilePath: file,
+			Model:    openai.Whisper1,
+			Prompt:   `the recording of a D&D session to be transcribed into text`,
+		},
+	)
+	if err != nil {
+		return "", err
+	}
+
+	return resp.Text, nil
+}
