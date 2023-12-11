@@ -1,3 +1,9 @@
+# [1.2.0](https://github.com/Jesse0Michael/pulse/compare/v1.1.0...v1.2.0) (2023-12-11)
+
+### Features
+
+- add audio command ([968fd23](https://github.com/Jesse0Michael/pulse/commit/968fd2364c67fc4b5403528c5cc0c671a749aab0))
+
 # [1.1.0](https://github.com/Jesse0Michael/pulse/compare/v1.0.6...v1.1.0) (2023-10-20)
 
 ### Continuous Integration
