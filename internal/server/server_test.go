@@ -21,7 +21,7 @@ func TestServer_route(t *testing.T) {
 	expected := []string{"githubUserSummary"}
 	received := []string{}
 
-	_ = server.router.Walk(func(route *mux.Route, router *mux.Router, ancestors []*mux.Route) error {
+	_ = server.router.Walk(func(route *mux.Route, _ *mux.Router, _ []*mux.Route) error {
 		received = append(received, route.GetName())
 		return nil
 	})
@@ -35,8 +35,8 @@ func Test_notFound(t *testing.T) {
 
 	notFound(resp, req)
 
-	assert.Equal(t, resp.Code, http.StatusNotFound)
-	assert.Equal(t, resp.Body.String(), `{"error":"page not found"}`)
+	assert.Equal(t, http.StatusNotFound, resp.Code)
+	assert.JSONEq(t, `{"error":"page not found"}`, resp.Body.String())
 }
 
 func Test_notAllowed(t *testing.T) {
@@ -45,6 +45,6 @@ func Test_notAllowed(t *testing.T) {
 
 	notAllowed(resp, req)
 
-	assert.Equal(t, resp.Code, http.StatusMethodNotAllowed)
-	assert.Equal(t, resp.Body.String(), `{"error":"method not allowed"}`)
+	assert.Equal(t, http.StatusMethodNotAllowed, resp.Code)
+	assert.JSONEq(t, `{"error":"method not allowed"}`, resp.Body.String())
 }

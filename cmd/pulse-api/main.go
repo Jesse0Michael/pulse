@@ -39,7 +39,7 @@ func main() {
 
 	// Exit safely
 	<-ctx.Done()
-	srvr.Close()
+	_ = srvr.Close()
 	slog.Info("exiting")
 }
 

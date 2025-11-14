@@ -2,7 +2,7 @@ package command
 
 import (
 	"context"
-	"log"
+	"fmt"
 	"os"
 	"time"
 
@@ -39,7 +39,7 @@ func (c *Github) Command() *cobra.Command {
 		PreRunE: c.Init,
 		PostRun: c.Output,
 		Args:    cobra.MinimumNArgs(1),
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(cmd *cobra.Command, _ []string) error {
 			return c.Run(cmd.Context())
 		},
 	}
@@ -91,8 +91,7 @@ func (c *Github) Init(cmd *cobra.Command, args []string) error {
 
 // Output will run after the execution of the command to write the results to StdOut.
 func (c *Github) Output(_ *cobra.Command, _ []string) {
-	log.SetOutput(os.Stdout)
-	log.Println(c.output)
+	fmt.Fprint(os.Stdout, c.output)
 }
 
 // Run will execute the github pulse summary generation process.

@@ -3,7 +3,6 @@ package command
 import (
 	"context"
 	"fmt"
-	"log"
 	"os"
 
 	"github.com/jesse0michael/pulse/internal/service"
@@ -34,7 +33,7 @@ func (c *Audio) Command() *cobra.Command {
 		PreRunE: c.Init,
 		PostRun: c.Output,
 		Args:    cobra.MinimumNArgs(1),
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(cmd *cobra.Command, _ []string) error {
 			return c.Run(cmd.Context())
 		},
 	}
@@ -64,8 +63,7 @@ func (c *Audio) Init(_ *cobra.Command, args []string) error {
 
 // Output will run after the execution of the command to write the results to StdOut.
 func (c *Audio) Output(_ *cobra.Command, _ []string) {
-	log.SetOutput(os.Stdout)
-	log.Println(c.output)
+	fmt.Fprint(os.Stdout, c.output)
 }
 
 // Run will execute the audio transcribe pulse summary generation process.

@@ -52,7 +52,7 @@ func (g *Github) UserActivity(ctx context.Context, username, organization, repos
 		return "", err
 	}
 	if resp != nil {
-		slog.Debug(resp.Status)
+		slog.DebugContext(ctx, resp.Status)
 	}
 
 	var out string
@@ -69,10 +69,10 @@ func (g *Github) UserActivity(ctx context.Context, username, organization, repos
 		if endDate != nil && event.GetCreatedAt().After(*endDate) {
 			continue
 		}
-		slog.Info("event", "id", event.GetID(), "type", event.GetType(), "repo", event.GetRepo(), "org", event.GetOrg())
+		slog.InfoContext(ctx, "event", "id", event.GetID(), "type", event.GetType(), "repo", event.GetRepo(), "org", event.GetOrg())
 
 		if activity := eventActivity(event); activity != "" {
-			out += activity + "\n"
+			out = fmt.Sprintf("%s%s\n", out, activity)
 		}
 	}
 

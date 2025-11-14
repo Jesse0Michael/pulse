@@ -9,11 +9,7 @@ endif
 #################################################################################
 # BUILD COMMANDS
 #################################################################################
-dependencies:
-	go install golang.org/x/vuln/cmd/govulncheck@latest
-	go install github.com/golang/mock/mockgen@v1.6.0
-
-gen: dependencies
+generate:
 	go generate ./...
 
 build-cli: 
@@ -26,13 +22,13 @@ test:
 	go test -cover ./... 
 
 lint:
-	golangci-lint run ./...
+	go tool golangci-lint run ./...
 
 cover:
 	go test -coverpkg ./internal/... -coverprofile coverage.out ./... && go tool cover -html=coverage.out
 
-vuln: dependencies
-	govulncheck -test ./...
+vuln: 
+	go tool govulncheck -test ./...
 
 behavior: build-cli
 	go test ./test/...  -tags=behavior

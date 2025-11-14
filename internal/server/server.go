@@ -24,6 +24,7 @@ type Config struct {
 
 type Server struct {
 	*http.Server
+
 	router *mux.Router
 	pulser Pulser
 }
@@ -69,5 +70,5 @@ func notAllowed(w http.ResponseWriter, _ *http.Request) {
 func writeError(w http.ResponseWriter, code int, err error) {
 	w.WriteHeader(code)
 	w.Header().Add("Content-Type", "application/json")
-	_, _ = w.Write([]byte(fmt.Sprintf(`{"error":%q}`, err.Error())))
+	_, _ = fmt.Fprintf(w, `{"error":%q}`, err.Error())
 }

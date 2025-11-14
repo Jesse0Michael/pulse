@@ -3,7 +3,6 @@ package server
 import (
 	"context"
 	"errors"
-	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"reflect"
@@ -23,7 +22,7 @@ type MockPulser struct {
 
 func (m *MockPulser) Summary(_ context.Context, req service.SummaryRequest) (string, error) {
 	if !reflect.DeepEqual(req, m.expected) {
-		return "", fmt.Errorf("unexpected req")
+		return "", errors.New("unexpected req")
 	}
 	return m.summary, m.err
 }
@@ -52,7 +51,11 @@ func TestServer_summary(t *testing.T) {
 		},
 		{
 			name: "successful summary: with params",
-			req:  httptest.NewRequest(http.MethodGet, "/summary/github/users/jesse0michael?organization=Jesse0Michael&repository=pulse&startDate=2023-09-12T00:00:01Z&endDate=2023-09-13T23:59:59Z", nil),
+			req: httptest.NewRequest(
+				http.MethodGet,
+				"/summary/github/users/jesse0michael?organization=Jesse0Michael&repository=pulse&startDate=2023-09-12T00:00:01Z&endDate=2023-09-13T23:59:59Z",
+				nil,
+			),
 			pulser: &MockPulser{
 				expected: service.SummaryRequest{
 					Username:     "jesse0michael",
