@@ -1,3 +1,9 @@
+## [1.2.1](https://github.com/Jesse0Michael/pulse/compare/v1.2.0...v1.2.1) (2025-11-14)
+
+### Bug Fixes
+
+- update go dependencies and linter ([1b88aee](https://github.com/Jesse0Michael/pulse/commit/1b88aee517f12e08bec05c80229d6901f6e43db7))
+
 # [1.2.0](https://github.com/Jesse0Michael/pulse/compare/v1.1.0...v1.2.0) (2023-12-11)
 
 ### Features
