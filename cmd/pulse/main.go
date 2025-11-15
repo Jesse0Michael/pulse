@@ -7,12 +7,13 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/jesse0michael/pkg/logger"
 	"github.com/jesse0michael/pulse/internal/command"
 	"github.com/spf13/cobra"
 )
 
 func main() {
-	initLog()
+	logger.NewLogger()
 
 	ctx, cancel := context.WithCancelCause(context.Background())
 	sig := make(chan os.Signal, 1)
@@ -43,15 +44,4 @@ func main() {
 		slog.With("error", err).ErrorContext(ctx, "failed to execute command")
 		os.Exit(1)
 	}
-}
-
-// initLog configures and sets the default logger.
-func initLog() {
-	handler := slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{
-		Level: slog.LevelInfo,
-	})
-
-	logger := slog.New(handler)
-
-	slog.SetDefault(logger)
 }

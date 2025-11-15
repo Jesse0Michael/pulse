@@ -6,8 +6,8 @@ import (
 	"os"
 	"time"
 
+	"github.com/jesse0michael/pkg/config"
 	"github.com/jesse0michael/pulse/internal/service"
-	"github.com/kelseyhightower/envconfig"
 	"github.com/spf13/cobra"
 )
 
@@ -62,8 +62,8 @@ Environment:
 
 // Init will initialize GitHub dependencies.
 func (c *Github) Init(cmd *cobra.Command, args []string) error {
-	var cfg GithubConfig
-	if err := envconfig.Process("", &cfg); err != nil {
+	cfg, err := config.New[GithubConfig]()
+	if err != nil {
 		return err
 	}
 

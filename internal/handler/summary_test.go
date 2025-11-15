@@ -1,4 +1,4 @@
-package server
+package handler
 
 import (
 	"context"
@@ -80,13 +80,13 @@ func TestServer_summary(t *testing.T) {
 				err:     errors.New("test-error"),
 			},
 			wantCode: http.StatusInternalServerError,
-			wantBody: `{"error":"test-error"}`,
+			wantBody: `{"errors":[{"message":"Internal Server Error"}]}`,
 		},
 	}
 	for i := range tests {
 		tt := tests[i]
 		t.Run(tt.name, func(t *testing.T) {
-			s := New(Config{}, tt.pulser)
+			s := New(tt.pulser)
 
 			resp := httptest.NewRecorder()
 			router := mux.NewRouter()

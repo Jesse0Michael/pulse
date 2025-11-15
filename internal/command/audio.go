@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/jesse0michael/pkg/config"
 	"github.com/jesse0michael/pulse/internal/service"
-	"github.com/kelseyhightower/envconfig"
 	"github.com/spf13/cobra"
 )
 
@@ -49,8 +49,8 @@ Environment:
 
 // Init will initialize audio dependencies.
 func (c *Audio) Init(_ *cobra.Command, args []string) error {
-	var cfg AudioConfig
-	if err := envconfig.Process("", &cfg); err != nil {
+	cfg, err := config.New[AudioConfig]()
+	if err != nil {
 		return err
 	}
 

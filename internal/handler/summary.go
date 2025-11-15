@@ -1,12 +1,13 @@
-package server
+package handler
 
 import (
-	"encoding/json"
 	"log/slog"
 	"net/http"
 	"time"
 
 	"github.com/gorilla/mux"
+	"github.com/jesse0michael/pkg/http/errors"
+	"github.com/jesse0michael/pkg/http/server"
 	"github.com/jesse0michael/pulse/internal/service"
 )
 
@@ -14,8 +15,9 @@ type Summary struct {
 	Summary string `json:"summary"`
 }
 
-func (s *Server) summary() http.HandlerFunc {
+func (s *Handler) summary() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		ctx := r.Context()
 		vars := mux.Vars(r)
 		q := r.URL.Query()
 		req := service.SummaryRequest{
@@ -34,16 +36,13 @@ func (s *Server) summary() http.HandlerFunc {
 			}
 		}
 
-		summary, err := s.pulser.Summary(r.Context(), req)
+		summary, err := s.pulser.Summary(ctx, req)
 		if err != nil {
-			slog.With("error", err).Error("failed to get summary")
-			writeError(w, http.StatusInternalServerError, err)
+			slog.ErrorContext(ctx, "failed to get summary", "error", err)
+			errors.WriteError(ctx, w, err)
 			return
 		}
 
-		b, _ := json.Marshal(Summary{Summary: summary})
-		w.Header().Add("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
-		_, _ = w.Write(b)
+		_ = server.Encode(w, http.StatusOK, &Summary{Summary: summary})
 	}
 }
