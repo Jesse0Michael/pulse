@@ -1,3 +1,13 @@
+# [1.3.0](https://github.com/Jesse0Michael/pulse/compare/v1.2.1...v1.3.0) (2025-11-15)
+
+### Features
+
+- use jesse0michael/pkg packages ([996f24f](https://github.com/Jesse0Michael/pulse/commit/996f24f58fe97211c63c6755efce2c62b791e1d6))
+
+### Other
+
+- Merge branch 'main' of ssh://github.com/Jesse0Michael/pulse ([d7463ac](https://github.com/Jesse0Michael/pulse/commit/d7463aca5ada5cbfdcc1e74b00b669d27063f4ae))
+
 ## [1.2.1](https://github.com/Jesse0Michael/pulse/compare/v1.2.0...v1.2.1) (2025-11-14)
 
 ### Bug Fixes
