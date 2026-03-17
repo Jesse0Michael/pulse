@@ -25,3 +25,5 @@ yarn-error.log*
 .coverage
 coverage.out
 .models
+.ollama
+.open-webui
