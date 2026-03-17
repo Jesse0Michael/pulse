@@ -14,6 +14,18 @@ generate:
 
 build-cli: 
 	go build -o ./bin/pulse ./cmd/pulse
+
+#################################################################################
+# RUN COMMANDS
+#################################################################################
+run-agent:
+	go run cmd/agent/main.go web api webui
+
+up: 
+	docker compose up
+
+down:
+	docker compose down
 	
 #################################################################################
 # TEST COMMANDS

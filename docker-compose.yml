@@ -1,0 +1,13 @@
+services:
+  ollama:
+    image: ollama/ollama:latest
+    restart: unless-stopped
+    entrypoint: ["/bin/sh","-c","for f in /models/*.Modelfile; do [ -f \"$f\" ] || continue; name=$(basename \"$f\" .Modelfile); if ! ollama list | awk '{print $1}' | grep -qx \"$name\"; then ollama create \"$name\" -f \"$f\" || true; fi; done; exec /bin/ollama serve"]
+    ports:
+      - "11434:11434"
+    environment:
+      - OLLAMA_KEEP_ALIVE=1h
+      - OLLAMA_MODELS=/models
+    volumes:
+      - ./.ollama:/root/.ollama
+      - ./.models:/models
