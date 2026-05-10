@@ -18,6 +18,12 @@ build-cli:
 #################################################################################
 # RUN COMMANDS
 #################################################################################
+pulse:
+	go run ./cmd/pulse
+
+ollama:
+	ollama serve
+
 run-agent:
 	go run cmd/agent/main.go web api webui
 
@@ -33,12 +39,12 @@ down:
 
 # Pull a model into Ollama (run once after `make up`). Override: make pull-model MODEL=qwen2.5
 pull-model:
-	docker exec pulse-ollama-1 ollama pull $(or $(MODEL),llama3.2)
+	ollama pull $(or $(MODEL),qwen3:8b)
 
 # Register a local GGUF from ./models/ as an Ollama model.
 # Usage: make register-model NAME=my-model FILE=my-model.gguf
 register-model:
-	@echo 'FROM /models/$(FILE)' | docker exec -i pulse-ollama-1 ollama create $(NAME) -f -
+	@echo 'FROM ./models/$(FILE)' > Modelfile && ollama create $(NAME) -f Modelfile && rm Modelfile
 	
 #################################################################################
 # TEST COMMANDS

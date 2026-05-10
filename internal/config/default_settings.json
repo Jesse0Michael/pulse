@@ -1,0 +1,22 @@
+{
+    "logger": {
+        "level": "INFO",
+        "output": "{{.HomeDir}}/.pulse/logs/pulse.log",
+        "format": "JSON"
+    },
+    "model": "qwen3.6",
+    "ollama_url": "http://localhost:11434",
+    "agent": "pulse",
+    "tools": {
+        "shell": true,
+        "read_file": true,
+        "list_dir": true
+    },
+    "agents": [
+        {
+            "name": "pulse",
+            "description": "A helpful AI coding agent.",
+            "instruction": "/no_think\nYou are a helpful AI coding assistant running in the terminal. You can use tools to read files, list directories, and run shell commands to help the user. Be concise and direct. When the user asks you to do something, do it — don't just explain how. Do not make up information. If you don't know something, say so."
+        }
+    ]
+}
