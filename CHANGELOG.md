@@ -1,3 +1,17 @@
+# [1.4.0](https://github.com/Jesse0Michael/pulse/compare/v1.3.1...v1.4.0) (2026-08-13)
+
+### Bug Fixes
+
+- agents ([0542de0](https://github.com/Jesse0Michael/pulse/commit/0542de02e6dd9b85ebb9d8ba91028cc8699b66b2))
+
+### Features
+
+- pulse cli ([9b9e534](https://github.com/Jesse0Michael/pulse/commit/9b9e534e424436a17e0aea0ab62d0264e17c3a3f))
+
+### Other
+
+- Merge branch 'main' of ssh://github.com/Jesse0Michael/pulse ([8913c59](https://github.com/Jesse0Michael/pulse/commit/8913c59f82c51f58821ce1dcf0aba12335ee77ab))
+
 ## [1.3.1](https://github.com/Jesse0Michael/pulse/compare/v1.3.0...v1.3.1) (2026-03-17)
 
 ### Bug Fixes
