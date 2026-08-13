@@ -19,7 +19,7 @@ build-cli:
 # RUN COMMANDS
 #################################################################################
 pulse:
-	go run ./cmd/pulse
+	go run ./cmd/pulse -a claude-code
 
 ollama:
 	ollama serve

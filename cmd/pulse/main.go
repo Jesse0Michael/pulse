@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log/slog"
 	"os"
+	"strings"
 
 	"github.com/jesse0michael/pkg/boot"
 	"github.com/jesse0michael/pulse/internal/cli"
@@ -38,6 +39,7 @@ func main() {
 	)
 
 	if err := app.Run(&pulse{}); err != nil {
+		fmt.Fprintf(os.Stderr, "pulse: %v\n", err)
 		os.Exit(1)
 	}
 }
@@ -47,9 +49,10 @@ type pulse struct{}
 
 func (r *pulse) Run(ctx context.Context, settings config.Settings) error {
 	root := &cobra.Command{
-		Use:   "pulse [mode...]",
-		Short: "AI Empowered Insights",
-		Args:  cobra.ArbitraryArgs,
+		Use:                "pulse [mode...]",
+		Short:              "AI Empowered Insights",
+		Args:               cobra.ArbitraryArgs,
+		DisableFlagParsing: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return runAgent(cmd.Context(), settings, args)
 		},
@@ -63,6 +66,20 @@ func (r *pulse) Run(ctx context.Context, settings config.Settings) error {
 func (r *pulse) Close() error { return nil }
 
 func runAgent(ctx context.Context, settings config.Settings, args []string) error {
+	// Filter out flag arguments (already parsed by boot/config); keep only
+	// positional args used as launcher modes (e.g. "console", "web").
+	var modes []string
+	for i := 0; i < len(args); i++ {
+		if strings.HasPrefix(args[i], "-") {
+			// Skip the flag and its value (e.g. "-a claude-code" or "--agent=foo").
+			if !strings.Contains(args[i], "=") && i+1 < len(args) {
+				i++ // skip the next arg (flag value)
+			}
+			continue
+		}
+		modes = append(modes, args[i])
+	}
+
 	agentCfg, err := settings.GetAgent(settings.Agent)
 	if err != nil {
 		return fmt.Errorf("%w\navailable agents: %v", err, settings.AgentNames())
@@ -87,7 +104,7 @@ func runAgent(ctx context.Context, settings config.Settings, args []string) erro
 		return fmt.Errorf("creating agent: %w", err)
 	}
 
-	launcherArgs := args
+	launcherArgs := modes
 	if len(launcherArgs) == 0 {
 		launcherArgs = []string{"console"}
 	}
@@ -95,8 +112,11 @@ func runAgent(ctx context.Context, settings config.Settings, args []string) erro
 	adkCfg := &adk.Config{
 		AgentLoader: services.NewSingleAgentLoader(agent),
 	}
+	console := cli.New()
+	console.AgentName = agentCfg.Name
+	console.ModelName = agentCfg.Model
 	l := universal.NewLauncher(
-		cli.New(),
+		console,
 		web.NewLauncher(api.NewLauncher(), a2a.NewLauncher(), webui.NewLauncher()),
 	)
 	return l.Execute(ctx, adkCfg, launcherArgs)

@@ -3,8 +3,10 @@ package cli
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/charmbracelet/bubbles/textarea"
 	"github.com/charmbracelet/bubbles/viewport"
@@ -12,7 +14,6 @@ import (
 	"github.com/charmbracelet/glamour"
 	"github.com/charmbracelet/lipgloss"
 	"google.golang.org/adk/agent"
-	"google.golang.org/adk/cmd/launcher"
 	"google.golang.org/adk/cmd/launcher/adk"
 	"google.golang.org/adk/runner"
 	"google.golang.org/adk/session"
@@ -20,10 +21,13 @@ import (
 )
 
 // Launcher is an ADK SubLauncher that runs an interactive bubbletea TUI.
-type Launcher struct{}
+type Launcher struct {
+	AgentName string
+	ModelName string
+}
 
 // New returns a new console SubLauncher.
-func New() launcher.SubLauncher { return &Launcher{} }
+func New() *Launcher { return &Launcher{} }
 
 func (*Launcher) Keyword() string           { return "console" }
 func (*Launcher) SimpleDescription() string { return "interactive TUI chat" }
@@ -53,13 +57,13 @@ func (l *Launcher) Run(ctx context.Context, cfg *adk.Config) error {
 		return fmt.Errorf("creating runner: %w", err)
 	}
 
-	m := newModel(ctx, r, userID, resp.Session.ID())
-	p := tea.NewProgram(m, tea.WithAltScreen(), tea.WithContext(ctx))
+	m := newModel(ctx, r, userID, resp.Session.ID(), l.AgentName, l.ModelName)
+	p := tea.NewProgram(m, tea.WithAltScreen(), tea.WithContext(ctx), tea.WithInputTTY())
 	_, err = p.Run()
 	return err
 }
 
-// styles
+// styles.
 var (
 	barStyle   = lipgloss.NewStyle().Foreground(lipgloss.Color("242"))
 	userStyle  = lipgloss.NewStyle().Foreground(lipgloss.Color("250")) // light grey
@@ -68,16 +72,30 @@ var (
 	hintStyle  = lipgloss.NewStyle().Foreground(lipgloss.Color("242")).Italic(true)
 )
 
-// streaming bridge messages
+// streaming bridge messages.
 type streamChunk struct{ text string }
 type streamDone struct{}
 type streamErr struct{ err error }
+type focusMsg struct{}
+
+// slashCommand describes an in-console command (typed as "/name ...").
+type slashCommand struct {
+	Name string
+	Desc string
+}
+
+var slashCommands = []slashCommand{
+	{Name: "skill", Desc: "run a skill"},
+}
 
 type model struct {
 	ctx       context.Context
 	runner    *runner.Runner
 	sessionID string
 	userID    string
+
+	agentName string
+	modelName string
 
 	vp    viewport.Model
 	input textarea.Model
@@ -93,24 +111,30 @@ type model struct {
 
 	md      *glamour.TermRenderer // refreshed on resize
 	mdWidth int                   // width md was built for
+
+	skills []Skill
 }
 
-func newModel(ctx context.Context, r *runner.Runner, userID, sessionID string) *model {
+func newModel(ctx context.Context, r *runner.Runner, userID, sessionID, agentName, modelName string) *model {
 	ta := textarea.New()
 	ta.Placeholder = "Send a message..."
 	ta.Prompt = inputStyle.Render("> ")
 	ta.ShowLineNumbers = false
 	ta.CharLimit = 0
-	ta.SetHeight(3)
-	ta.Focus()
+	ta.SetHeight(1)
+	ta.FocusedStyle.CursorLine = lipgloss.NewStyle()
+	ta.Blur()
 
 	return &model{
 		ctx:       ctx,
 		runner:    r,
 		sessionID: sessionID,
 		userID:    userID,
+		agentName: agentName,
+		modelName: modelName,
 		input:     ta,
 		events:    make(chan tea.Msg, 64),
+		skills:    LoadSkills(),
 	}
 }
 
@@ -119,17 +143,33 @@ func (m *model) Init() tea.Cmd {
 }
 
 func (m *model) waitForEvent() tea.Cmd {
-	return func() tea.Msg { return <-m.events }
+	return func() tea.Msg {
+		select {
+		case msg := <-m.events:
+			return msg
+		case <-m.ctx.Done():
+			return nil
+		}
+	}
 }
 
 func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
+		wasReady := m.ready
 		m.width = msg.Width
 		m.height = msg.Height
 		m.relayout()
 		m.vp.SetContent(m.renderHistory())
 		m.vp.GotoBottom()
+		if !wasReady {
+			return m, tea.Tick(100*time.Millisecond, func(time.Time) tea.Msg { return focusMsg{} })
+		}
+		return m, nil
+
+	case focusMsg:
+		m.input.Reset()
+		m.input.Focus()
 		return m, nil
 
 	case tea.KeyMsg:
@@ -153,12 +193,20 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if text == "" {
 				return m, nil
 			}
+			payload, display, cmdErr := m.expandCommand(text)
+			if cmdErr != nil {
+				m.input.Reset()
+				m.turns = append(m.turns, errorStyle.Render("error: "+cmdErr.Error()))
+				m.vp.SetContent(m.renderHistory())
+				m.vp.GotoBottom()
+				return m, nil
+			}
 			m.input.Reset()
-			m.turns = append(m.turns, renderUser(text, m.contentWidth()))
+			m.turns = append(m.turns, renderUser(display, m.contentWidth()))
 			m.vp.SetContent(m.renderHistory())
 			m.vp.GotoBottom()
 			m.busy = true
-			return m, m.startTurn(text)
+			return m, m.startTurn(payload)
 		}
 
 	case streamChunk:
@@ -201,28 +249,33 @@ func (m *model) View() string {
 	if !m.ready {
 		return ""
 	}
-	bar := barStyle.Render(strings.Repeat("─", m.width))
+	topBar := m.topBar()
+	topSep := barStyle.Render(strings.Repeat("─", m.width))
+	botSep := barStyle.Render(strings.Repeat("─", m.width))
 	hint := ""
 	if m.busy {
 		hint = hintStyle.Render(" thinking… (esc to cancel)")
 	}
 	return lipgloss.JoinVertical(lipgloss.Left,
+		topBar,
+		topSep,
 		m.vp.View(),
-		bar+hint,
+		botSep+hint,
 		m.input.View(),
+		m.helperLine(),
 	)
 }
 
 func (m *model) relayout() {
 	const (
-		barH      = 1
-		inputH    = 3
-		minVPH    = 3
+		topBarH = 1
+		topSepH = 1
+		botSepH = 1
+		inputH  = 1
+		helperH = 1
+		minVPH  = 3
 	)
-	vpH := m.height - barH - inputH
-	if vpH < minVPH {
-		vpH = minVPH
-	}
+	vpH := max(m.height-topBarH-topSepH-botSepH-inputH-helperH, minVPH)
 	if !m.ready {
 		m.vp = viewport.New(m.width, vpH)
 		m.ready = true
@@ -231,11 +284,11 @@ func (m *model) relayout() {
 		m.vp.Height = vpH
 	}
 	m.input.SetWidth(m.width)
-	m.input.SetHeight(inputH)
+	m.input.SetHeight(1)
 
 	if w := m.contentWidth(); w != m.mdWidth {
 		if r, err := glamour.NewTermRenderer(
-			glamour.WithAutoStyle(),
+			glamour.WithStandardStyle("dark"),
 			glamour.WithWordWrap(w*9/10),
 		); err == nil {
 			m.md = r
@@ -249,6 +302,18 @@ func (m *model) contentWidth() int {
 		return 80
 	}
 	return m.width
+}
+
+func (m *model) topBar() string {
+	var parts []string
+	if m.agentName != "" {
+		parts = append(parts, "agent: "+m.agentName)
+	}
+	if m.modelName != "" {
+		parts = append(parts, "model: "+m.modelName)
+	}
+	info := strings.Join(parts, "  │  ")
+	return barStyle.Render(info)
 }
 
 func (m *model) renderHistory() string {
@@ -296,6 +361,84 @@ func (m *model) renderAIFinal(text string) string {
 	return strings.TrimRight(out, "\n")
 }
 
+// expandCommand resolves slash commands like "/skill weekly-summary" into the
+// payload sent to the agent and the text shown in the user bubble. Non-slash
+// input passes through unchanged.
+func (m *model) expandCommand(text string) (payload, display string, err error) {
+	if !strings.HasPrefix(text, "/") {
+		return text, text, nil
+	}
+	parts := strings.SplitN(strings.TrimPrefix(text, "/"), " ", 2)
+	cmd := parts[0]
+	arg := ""
+	if len(parts) > 1 {
+		arg = strings.TrimSpace(parts[1])
+	}
+	switch cmd {
+	case "skill":
+		if arg == "" {
+			return "", "", errors.New("usage: /skill <name>")
+		}
+		var found *Skill
+		for i := range m.skills {
+			if m.skills[i].Name == arg {
+				found = &m.skills[i]
+				break
+			}
+		}
+		if found == nil {
+			return "", "", fmt.Errorf("skill %q not found", arg)
+		}
+		content, cerr := found.Content()
+		if cerr != nil {
+			return "", "", cerr
+		}
+		return "Execute the following skill:\n\n" + content, "/skill " + arg, nil
+	}
+	return "", "", fmt.Errorf("unknown command: /%s", cmd)
+}
+
+// helperLine returns the contextual hint rendered under the input. Empty
+// input or non-slash input yields an empty line so the layout stays stable.
+func (m *model) helperLine() string {
+	val := strings.TrimLeft(m.input.Value(), " \t")
+	if !strings.HasPrefix(val, "/") {
+		return ""
+	}
+	rest := strings.TrimPrefix(val, "/")
+	// If a space appears, the user has moved past the command name and is
+	// typing an argument — show completions for that argument.
+	if idx := strings.IndexAny(rest, " \n"); idx >= 0 {
+		cmd := rest[:idx]
+		arg := strings.TrimSpace(rest[idx:])
+		switch cmd {
+		case "skill":
+			var names []string
+			for _, s := range m.skills {
+				if arg == "" || strings.HasPrefix(s.Name, arg) {
+					names = append(names, s.Name)
+				}
+			}
+			if len(names) == 0 {
+				return hintStyle.Render("  no skills match")
+			}
+			return hintStyle.Render("  skills: " + strings.Join(names, ", "))
+		}
+		return hintStyle.Render("  unknown command")
+	}
+	// No space yet — list commands matching the partial name.
+	var matches []string
+	for _, c := range slashCommands {
+		if strings.HasPrefix(c.Name, rest) {
+			matches = append(matches, "/"+c.Name+" — "+c.Desc)
+		}
+	}
+	if len(matches) == 0 {
+		return hintStyle.Render("  no commands match")
+	}
+	return hintStyle.Render("  " + strings.Join(matches, "   "))
+}
+
 // startTurn launches a goroutine that ranges over the runner's event stream
 // and posts streaming messages back to the bubbletea program via m.events.
 func (m *model) startTurn(text string) tea.Cmd {
@@ -317,9 +460,11 @@ func (m *model) startTurn(text string) tea.Cmd {
 				continue
 			}
 			var s string
+			var sSb418 strings.Builder
 			for _, p := range ev.LLMResponse.Content.Parts {
-				s += p.Text
+				sSb418.WriteString(p.Text)
 			}
+			s += sSb418.String()
 			if s == "" {
 				continue
 			}

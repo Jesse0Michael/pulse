@@ -22,6 +22,16 @@
                 "read_file": true,
                 "list_dir": false
             }
+        },
+        {
+            "name": "qwen-code",
+            "description": "Qwen Code's full agent prompt, adapted for pulse's three tools.",
+            "prompt_file": "prompts/qwen-code.md"
+        },
+        {
+            "name": "claude-code",
+            "description": "Claude Code-inspired prompt, distilled for pulse's three tools.",
+            "prompt_file": "prompts/claude-code.md"
         }
     ]
 }
