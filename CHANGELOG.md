@@ -1,3 +1,13 @@
+## [1.3.1](https://github.com/Jesse0Michael/pulse/compare/v1.3.0...v1.3.1) (2026-03-17)
+
+### Bug Fixes
+
+- ollama ui ([792d8e9](https://github.com/Jesse0Michael/pulse/commit/792d8e987a1ba13c989692efa24d1c0b06a48285))
+
+### Chores
+
+- agent init ([7fa5570](https://github.com/Jesse0Michael/pulse/commit/7fa55704923c1af4fb152fc02f1bfeb20ce1f7b2))
+
 # [1.3.0](https://github.com/Jesse0Michael/pulse/compare/v1.2.1...v1.3.0) (2025-11-15)
 
 ### Features
